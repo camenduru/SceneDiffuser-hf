@@ -4,6 +4,7 @@ import random
 import pickle
 import numpy as np
 import zipfile
+import trimesh
 from PIL import Image
 from huggingface_hub import hf_hub_download
 
@@ -15,6 +16,27 @@ def pose_generation(scene, count):
     
     images = [Image.fromarray(results[scene][random.randint(0, 19)]) for i in range(count)]
     return images
+
+def pose_generation_mesh(scene, count):
+    assert isinstance(scene, str)
+    scene_path = f"./results/pose_generation/mesh_results/{scene}/scene_downsample.ply"
+    if not os.path.exists(scene_path):
+        results_path = hf_hub_download('SceneDiffuser/SceneDiffuser', 'results/pose_generation/mesh_results.zip')
+        os.makedirs('./results/pose_generation/', exist_ok=True)
+        with zipfile.ZipFile(results_path, 'r') as zip_ref:
+            zip_ref.extractall('./results/pose_generation/')
+    
+    res = './results/pose_generation/tmp.glb'
+    S = trimesh.Scene()
+    S.add_geometry(trimesh.load(scene_path))
+    for i in range(count):
+        rid = random.randint(0, 19)
+        S.add_geometry(trimesh.load(
+            f"./results/pose_generation/mesh_results/{scene}/body{rid:0>3d}.ply"
+        ))
+    S.export(res)
+    
+    return res
 
 def grasp_generation(case_id):
     assert isinstance(case_id, str)
@@ -59,6 +81,15 @@ with gr.Blocks() as demo:
                     gr.Gallery(label="Result").style(grid=[1], height="auto")
                 ]
     button1.click(pose_generation, inputs=input1, outputs=output1)
+
+    with gr.Tab("Pose Generation Mesh"):
+        input11 = [
+            gr.Dropdown(choices=['MPH16', 'MPH1Library', 'N0SittingBooth', 'N3OpenArea'], label='Scenes'),
+            gr.Slider(minimum=1, maximum=4, step=1, label='Count', interactive=True)
+        ]
+        button11 = gr.Button("Generate")
+        output11 = gr.Model3D(clear_color=[255, 255, 255, 255], label="Result")
+    button11.click(pose_generation_mesh, inputs=input11, outputs=output11)
 
     ## motion generation
     with gr.Tab("Motion Generation"):
