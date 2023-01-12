@@ -3,6 +3,7 @@ import gradio as gr
 import random
 import pickle
 import numpy as np
+import zipfile
 from PIL import Image
 from huggingface_hub import hf_hub_download
 
@@ -14,6 +15,17 @@ def pose_generation(scene, count):
     
     images = [Image.fromarray(results[scene][random.randint(0, 19)]) for i in range(count)]
     return images
+
+def grasp_generation(case_id):
+    assert isinstance(case_id, str)
+    res = f"./results/grasp_generation/results/{case_id}/{random.randint(0, 19)}.glb"
+    if not os.path.exists(res):
+        results_path = hf_hub_download('SceneDiffuser/SceneDiffuser', 'results/grasp_generation/results.zip')
+        os.makedirs('./results/grasp_generation/', exist_ok=True)
+        with zipfile.ZipFile(results_path, 'r') as zip_ref:
+            zip_ref.extractall('./results/grasp_generation/')
+    
+    return res
 
 def path_planning(case_id):
     assert isinstance(case_id, str)
@@ -54,7 +66,17 @@ with gr.Blocks() as demo:
     
     ## grasp generation
     with gr.Tab("Grasp Generation"):
-        gr.Markdown('Coming soon!')
+        with gr.Row():
+            with gr.Column():
+                input3 = [
+                    gr.Dropdown(choices=['contactdb+apple', 'contactdb+camera', 'contactdb+cylinder_medium', 'contactdb+door_knob', 'contactdb+rubber_duck', 'contactdb+water_bottle', 'ycb+baseball', 'ycb+pear', 'ycb+potted_meat_can', 'ycb+tomato_soup_can'], label='Objects')
+                ]
+                button3 = gr.Button("Run")
+            with gr.Column():
+                output3 = [
+                    gr.Model3D(clear_color=[255, 255, 255, 255], label="Result")
+                ]
+    button3.click(grasp_generation, inputs=input3, outputs=output3)
     
     ## path planning
     with gr.Tab("Path Planing"):
