@@ -38,6 +38,24 @@ def pose_generation_mesh(scene, count):
     
     return res
 
+def motion_generation(scene):
+    assert isinstance(scene, str)
+    cnt = {
+        'MPH1Library': 3,
+        'MPH16': 6,
+        'N0SittingBooth': 7,
+        'N3OpenArea': 5
+    }[scene]
+
+    res = f"./results/motion_generation/results/{scene}/{random.randint(0, cnt-1)}.gif"
+    if not os.path.exists(res):
+        results_path = hf_hub_download('SceneDiffuser/SceneDiffuser', 'results/motion_generation/results.zip')
+        os.makedirs('./results/motion_generation/', exist_ok=True)
+        with zipfile.ZipFile(results_path, 'r') as zip_ref:
+            zip_ref.extractall('./results/motion_generation/')
+    
+    return res
+
 def grasp_generation(case_id):
     assert isinstance(case_id, str)
     res = f"./results/grasp_generation/results/{case_id}/{random.randint(0, 19)}.glb"
@@ -93,7 +111,15 @@ with gr.Blocks() as demo:
 
     ## motion generation
     with gr.Tab("Motion Generation"):
-        gr.Markdown('Coming soon!')
+        with gr.Row():
+            with gr.Column():
+                input2 = [
+                    gr.Dropdown(choices=['MPH16', 'MPH1Library', 'N0SittingBooth', 'N3OpenArea'], label='Scenes')
+                ]
+                button2 = gr.Button("Generate")
+            with gr.Column():
+                output2 = gr.Image(label="Result")
+    button2.click(motion_generation, inputs=input2, outputs=output2)
     
     ## grasp generation
     with gr.Tab("Grasp Generation"):
