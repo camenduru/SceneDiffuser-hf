@@ -154,5 +154,7 @@ with gr.Blocks() as demo:
     ## arm motion planning
     with gr.Tab("Arm Motion Planning"):
         gr.Markdown('Coming soon!')
+
+    gr.Markdown("<p>Note: Currently, the output results are pre-sampled results. We will deploy a real-time model after we release the code.</p>")
     
 demo.launch()
