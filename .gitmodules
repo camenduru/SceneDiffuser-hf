@@ -1,0 +1,3 @@
+[submodule "scenediffuser"]
+	path = scenediffuser
+	url = https://github.com/scenediffuser/Scene-Diffuser
