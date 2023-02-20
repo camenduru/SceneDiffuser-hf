@@ -3,6 +3,7 @@ import gradio as gr
 import os
 os.environ["PYOPENGL_PLATFORM"] = "osmesa" #opengl seems to only work with TPU
 print(os.environ['PYOPENGL_PLATFORM'])
+from OpenGL.osmesa import OSMesaCreateContextAttribs
 
 import numpy as np
 import os
