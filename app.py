@@ -2,7 +2,6 @@ import gradio as gr
 
 import os
 os.environ["PYOPENGL_PLATFORM"] = "egl" #opengl seems to only work with TPU
-os.environ['DISPLAY'] = ':0.0'
 from OpenGL import EGL
 print(os.environ['PYOPENGL_PLATFORM'])
 

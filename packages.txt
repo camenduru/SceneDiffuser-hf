@@ -2,6 +2,7 @@ build-essential
 libgl1
 libgl1-mesa-dev
 libglu1-mesa-dev
+freeglut3
 freeglut3-dev
 libglew-dev
 libglm-dev
@@ -14,3 +15,4 @@ libgles2-mesa-dev
 libglfw3-dev
 mesa-utils
 xvfb
+llvm-6.0
