@@ -1,6 +1,8 @@
 import os
 import sys
-sys.path.append('./scenediffuser/')
+root_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.join(root_dir, 'scenediffuser'))
+print(sys.path)
 import gradio as gr
 
 import interface as IF
