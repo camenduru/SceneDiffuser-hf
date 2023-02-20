@@ -7,7 +7,6 @@ libegl1
 libegl1-mesa
 libegl1-mesa-dev
 libegl-mesa0
-libegl-dev
 libgbm1
 libosmesa6-dev
 libgles2-mesa-dev
