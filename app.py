@@ -8,6 +8,7 @@ from OpenGL.osmesa import OSMesaCreateContextAttribs
 import numpy as np
 import os
 import trimesh
+import pyrender
 from pyrender import PerspectiveCamera,\
                      DirectionalLight, SpotLight, PointLight,\
                      MetallicRoughnessMaterial,\
@@ -19,6 +20,17 @@ scene = Scene()
 axis = trimesh.creation.axis()
 axis = Mesh.from_trimesh(axis, smooth=False)
 scene.add(axis)
+
+camera_center = np.array([951.30, 536.77])
+
+camera = pyrender.camera.IntrinsicsCamera(
+    fx=1060.53, fy=1060.38,
+    cx=camera_center[0], cy=camera_center[1])
+light = pyrender.DirectionalLight(color=np.ones(3), intensity=2.0)
+camera_pose = np.eye(4)
+scene.add(camera, pose=camera_pose)
+scene.add(light, pose=camera_pose)
+
 
 r = OffscreenRenderer(
     viewport_width=720,
