@@ -12,3 +12,5 @@ libgles2
 libgles2-mesa
 libgles2-mesa-dev
 libglfw3-dev
+mesa-utils
+xvfb
