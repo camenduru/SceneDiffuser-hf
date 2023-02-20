@@ -17,7 +17,6 @@ plotly==5.11.0
 protobuf==3.19.4
 pyopengl==3.1.5
 pyquaternion==0.9.9
-pyrender==0.1.45
 smplx==0.1.28
 tabulate==0.8.10
 tensorboard==2.8.0
