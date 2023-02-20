@@ -1,7 +1,7 @@
 import os
 import sys
 root_dir = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.join(root_dir, 'scenediffuser'))
+sys.path.insert(1, os.path.join(root_dir, 'scenediffuser'))
 print(sys.path)
 import gradio as gr
 
