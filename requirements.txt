@@ -1,4 +1,6 @@
-pytorch3d -f https://dl.fbaipublicfiles.com/pytorch3d/packaging/wheels/py38_cu113_pyt1110/download.html
+--no-index
+-f https://dl.fbaipublicfiles.com/pytorch3d/packaging/wheels/py38_cu113_pyt1110/download.html
+pytorch3d
 -e git+https://github.com/Silverster98/pytorch_kinematics#egg=pytorch_kinematics
 git+https://github.com/otaheri/chamfer_distance.git@d2b524309db114d0f7ce18be6c01b3802cde9791
 git+https://github.com/Silverster98/pointops@T4
