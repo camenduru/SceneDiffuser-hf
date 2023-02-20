@@ -20,5 +20,4 @@ libosmesa6
 libosmesa6-dev
 libglx-mesa0
 libglew-dev
-osmesa
 llvm-6.0
