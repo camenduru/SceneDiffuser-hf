@@ -1,5 +1,5 @@
 pyrender==0.1.45
 trimesh
 pillow
-PyOpenGL==3.1.5
+PyOpenGL==3.1.0
 networkx==2.8.6
