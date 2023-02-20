@@ -4,5 +4,8 @@ libglu1-mesa-dev
 freeglut3-dev
 libglew-dev
 libglm-dev
+libegl-mesa0
+libegl1
+libegl1-mesa
 libgles2-mesa
 libgles2-mesa-dev
