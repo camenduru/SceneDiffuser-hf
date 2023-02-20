@@ -1,4 +1,6 @@
 build-essential
+libgbm1
+libegl1-mesa
 libgl1
 libgl1-mesa-dev
 libglu1-mesa-dev
@@ -9,6 +11,7 @@ libglm-dev
 libegl-mesa0
 libegl1
 libegl1-mesa
+libgl1-mesa-dri
 libgles2
 libgles2-mesa
 libgles2-mesa-dev
