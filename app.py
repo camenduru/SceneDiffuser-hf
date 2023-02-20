@@ -1,4 +1,5 @@
 import os
+os.environ['PYOPENGL_PLATFORM'] = 'egl'
 import sys
 root_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(1, os.path.join(root_dir, 'scenediffuser'))
