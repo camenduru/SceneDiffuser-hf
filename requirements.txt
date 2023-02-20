@@ -1,3 +1,4 @@
 pyrender
 trimesh
 pillow
+PyOpenGL==3.1.5
