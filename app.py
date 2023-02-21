@@ -13,7 +13,7 @@ with gr.Blocks(css='style.css') as demo:
         gr.HTML(value="<p align='center' style='font-size: 1.2em; color: #485fc7;'><a href='https://arxiv.org/abs/2301.06015' target='_blank'>arXiv</a> | <a href='https://scenediffuser.github.io/' target='_blank'>Project Page</a> | <a href='https://github.com/scenediffuser/Scene-Diffuser' target='_blank'>Code</a></p>")
         gr.Markdown("<p align='center'><i>\"SceneDiffuser provides a unified model for solving scene-conditioned generation, optimization, and planning.\"</i></p>")
 
-        ## five task
+        ## five tasks
         ## pose generation
         with gr.Tab("Pose Generation"):
             with gr.Row():
@@ -32,33 +32,23 @@ with gr.Blocks(css='style.css') as demo:
         button1.click(IF.pose_generation, inputs=input1, outputs=[image1])
 
         ## motion generation
-        # with gr.Tab("Motion Generation"):
-        #     with gr.Row():
-        #         with gr.Column(scale=2):
-        #             selector2 = gr.Dropdown(choices=['MPH16', 'MPH1Library', 'N0SittingBooth', 'N3OpenArea'], label='Scenes', value='MPH16', interactive=True)
-        #             with gr.Row():
-        #                 sample2 = gr.Slider(minimum=1, maximum=8, step=1, label='Count', interactive=True, value=1)
-        #                 seed2 = gr.Slider(minimum=0, maximum=2 ** 16, step=1, label='Seed', interactive=True, value=2023)
-        #             with gr.Row():
-        #                 withstart = gr.Checkbox(label='With Start', interactive=True, value=False)
-        #             opt2 = gr.Checkbox(label='Optimizer Guidance', interactive=True, value=True)
-        #             scale_opt2 = gr.Slider(minimum=0.1, maximum=9.9, step=0.1, label='Scale', interactive=True, value=1.1)
-        #             button2 = gr.Button("Run")
-        #         with gr.Column(scale=3):
-        #             image2 = gr.Image(label="Result")
-        # input2 = [selector2, sample2, seed2, withstart, opt2, scale_opt2]
-        # button2.click(IF.motion_generation, inputs=input2, outputs=image2)
         with gr.Tab("Motion Generation"):
             with gr.Row():
                 with gr.Column(scale=2):
-                    input2 = [
-                        gr.Dropdown(choices=['MPH16', 'MPH1Library', 'N0SittingBooth', 'N3OpenArea'], label='Scenes')
-                    ]
-                    button2 = gr.Button("Generate")
-                    gr.HTML("<p style='font-size: 0.9em; color: #555555;'>Notes: the output results are pre-sampled results. We will deploy a real-time model for this task soon.</p>")
+                    selector2 = gr.Dropdown(choices=['MPH16', 'MPH1Library', 'N0SittingBooth', 'N3OpenArea'], label='Scenes', value='MPH16', interactive=True)
+                    with gr.Row():
+                        sample2 = gr.Slider(minimum=1, maximum=2, step=1, label='Count', interactive=True, value=1)
+                        seed2 = gr.Slider(minimum=0, maximum=2 ** 16, step=1, label='Seed', interactive=True, value=2023)
+                    with gr.Row():
+                        withstart = gr.Checkbox(label='With Start', interactive=True, value=False)
+                    opt2 = gr.Checkbox(label='Optimizer Guidance', interactive=True, value=False)
+                    scale_opt2 = gr.Slider(minimum=0.1, maximum=9.9, step=0.1, label='Scale', interactive=True, value=1.1)
+                    button2 = gr.Button("Run")
                 with gr.Column(scale=3):
-                    output2 = gr.Image(label="Result")
-        button2.click(IF.motion_generation, inputs=input2, outputs=output2)
+                    image2 = gr.Gallery(label="Image [Result]").style(grid=[1], height="50")
+                    gr.HTML("<p style='font-size: 0.9em; color: #555555;'>Notes: For motion generation, it will take a long time to do sampleing and rendering, especifically when you tick optimizer guidance.</p>")
+        input2 = [selector2, sample2, seed2, withstart, opt2, scale_opt2]
+        button2.click(IF.motion_generation, inputs=input2, outputs=image2)
         
         ## grasp generation
         with gr.Tab("Grasp Generation"):

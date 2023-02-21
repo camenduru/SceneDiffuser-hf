@@ -4,6 +4,8 @@ import torch
 import hydra
 import numpy as np
 import zipfile
+import time
+import uuid
 
 from typing import Any
 from hydra import compose, initialize
@@ -24,9 +26,9 @@ def model_weight_path(task, has_observation=False):
     if task == 'pose_gen':
         return hf_hub_download('SceneDiffuser/SceneDiffuser', 'weights/2022-11-09_11-22-52_PoseGen_ddm4_lr1e-4_ep100/ckpts/model.pth')
     elif task == 'motion_gen' and has_observation == True:
-        return hf_hub_download('SceneDiffuser/SceneDiffuser', 'weights//ckpts/model.pth')
+        return hf_hub_download('SceneDiffuser/SceneDiffuser', 'weights/2022-11-09_14-28-12_MotionGen_ddm_T200_lr1e-4_ep300_obser/ckpts/model.pth')
     elif task == 'motion_gen' and has_observation == False:
-        return hf_hub_download('SceneDiffuser/SceneDiffuser', 'weights//ckpts/model.pth')
+        return hf_hub_download('SceneDiffuser/SceneDiffuser', 'weights/2022-11-09_12-54-50_MotionGen_ddm_T200_lr1e-4_ep300/ckpts/model.pth')
     elif task == 'path_planning':
         return hf_hub_download('SceneDiffuser/SceneDiffuser', 'weights/2022-11-25_20-57-28_Path_ddm4_LR1e-4_E100_REL/ckpts/model.pth')
     else:
@@ -140,7 +142,10 @@ def _planning(cfg: DictConfig, scene: str) -> Any:
 
 
 ## interface for five task
-## real-time model: pose generation, path planning
+## real-time model:
+##   - pose generation
+##   - motion generation
+##   - path planning
 def pose_generation(scene, count, seed, opt, scale) -> Any:
     scene_model_weight_path = pretrain_pointtrans_weight_path()
     data_dir, smpl_dir, prox_dir, vposer_dir = pose_motion_data_path()
@@ -181,22 +186,63 @@ def pose_generation(scene, count, seed, opt, scale) -> Any:
     hydra.core.global_hydra.GlobalHydra.instance().clear()
     return res
 
-def motion_generation(scene):
-    assert isinstance(scene, str)
-    cnt = {
-        'MPH1Library': 3,
-        'MPH16': 6,
-        'N0SittingBooth': 7,
-        'N3OpenArea': 5
-    }[scene]
-
-    res = f"./results/motion_generation/results/{scene}/{random.randint(0, cnt-1)}.gif"
-    if not os.path.exists(res):
-        results_path = hf_hub_download('SceneDiffuser/SceneDiffuser', 'results/motion_generation/results.zip')
-        os.makedirs('./results/motion_generation/', exist_ok=True)
-        with zipfile.ZipFile(results_path, 'r') as zip_ref:
-            zip_ref.extractall('./results/motion_generation/')
+def motion_generation(scene, count, seed, withstart, opt, scale) -> Any:
+    scene_model_weight_path = pretrain_pointtrans_weight_path()
+    data_dir, smpl_dir, prox_dir, vposer_dir = pose_motion_data_path()
+    override_config = [
+        "diffuser=ddpm",
+        "diffuser.steps=200",
+        "model=unet",
+        "model.use_position_embedding=true",
+        f"model.scene_model.pretrained_weights={scene_model_weight_path}",
+        "task=motion_gen",
+        f"task.has_observation={withstart}",
+        "task.dataset.repr_type=absolute",
+        "task.dataset.frame_interval_test=20",
+        "task.visualizer.name=MotionGenVisualizerHF",
+        f"task.visualizer.ksample={count}",
+        f"task.dataset.data_dir={data_dir}",
+        f"task.dataset.smpl_dir={smpl_dir}",
+        f"task.dataset.prox_dir={prox_dir}",
+        f"task.dataset.vposer_dir={vposer_dir}",
+    ]
+    if opt == True:
+        override_config += [
+            "optimizer=motion_in_scene",
+            "optimizer.scale_type=div_var",
+            f"optimizer.scale={scale}",
+            "optimizer.vposer=false",
+            "optimizer.contact_weight=0.02",
+            "optimizer.collision_weight=1.0",
+            "optimizer.smoothness_weight=0.001",
+            "optimizer.frame_interval=1",
+        ]
     
+    initialize(config_path="./scenediffuser/configs", version_base=None)
+    config = compose(config_name="default", overrides=override_config)
+
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+
+    res_gifs = _sampling(config, scene)
+
+    ## save sampled motion as .gif file
+    datestr = time.strftime("%Y-%m-%d", time.localtime(time.time()))
+    target_dir = os.path.join('./results/motion_generation/', f'd-{datestr}')
+    os.makedirs(target_dir, exist_ok=True)
+    res = []
+    uuid_str = uuid.uuid4()
+    for i, imgs in enumerate(res_gifs):
+        target_path = os.path.join(target_dir, f'{uuid_str}--{i}.gif')
+        imgs = [im.resize((720, 405)) for im in imgs] # resize image for low resolution to save space
+        img, *img_rest = imgs
+        img.save(fp=target_path, format='GIF', append_images=img_rest, save_all=True, duration=33.33, loop=0)
+        res.append(target_path)
+
+    hydra.core.global_hydra.GlobalHydra.instance().clear()
     return res
 
 def grasp_generation(case_id):
